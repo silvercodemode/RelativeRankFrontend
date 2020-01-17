@@ -1,12 +1,8 @@
 import PropTypes from 'prop-types';
 import { NextPage } from 'next';
+import Navbar from '../components/Navbar';
 
-const Home: NextPage<{ userAgent: string }> = ({ userAgent }) => (
-  <h1>
-    Hello world! - user agent:
-    {userAgent}
-  </h1>
-);
+const Home: NextPage<{ userAgent: string }> = ({ userAgent }) => <Navbar />;
 
 Home.propTypes = {
   userAgent: PropTypes.string.isRequired,
