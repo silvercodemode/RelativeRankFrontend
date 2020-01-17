@@ -24,7 +24,7 @@ function Navbar() {
             href="#responsive-header"
             className="block mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white"
           >
-            Blog
+            About
           </a>
         </div>
       </div>
