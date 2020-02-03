@@ -1,5 +1,5 @@
 import React from 'react';
-import RelativeRankedShow from '../types/RelativeRankedShow';
+import RelativeRankedShow from '../types/relative-ranked-show';
 import RelativeRankedShowComponent from './RelativeRankedShow';
 
 type hasArrayOfRelativeRankedShows = {
@@ -7,12 +7,15 @@ type hasArrayOfRelativeRankedShows = {
 };
 
 function RankedShowList({ shows }: hasArrayOfRelativeRankedShows) {
+  console.log(shows);
   return (
-    <div className="max-w-sm mx-auto shadow-lg">
-      {shows.map(({ name, percentileRank }) => (
+    <div className="max-w-xl m-5 mx-auto shadow-lg odd:bg-red-900">
+      {shows.map(({ name, rank, percentileRank }) => (
         <RelativeRankedShowComponent
+          key={name}
           name={name}
-          percentileRank={percentileRank}
+          rank={rank}
+          percentileRank={Math.round(percentileRank * 1000) / 1000}
         />
       ))}
     </div>
