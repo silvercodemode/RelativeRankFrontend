@@ -5,7 +5,6 @@ import '../styles/styles.css';
 import { AppContext, AppInitialProps, AppProps } from 'next/app';
 import { Provider } from 'react-redux';
 import store from '../redux/store';
-import { withReduxStore } from '../redux/withReduxStore';
 
 const App: NextComponentType<AppContext, AppInitialProps, AppProps> = ({
   Component,

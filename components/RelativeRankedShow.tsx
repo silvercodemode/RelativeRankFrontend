@@ -1,5 +1,5 @@
 import React from 'react';
-import RelativeRankedShowType from '../types/relative-ranked-show';
+import { RelativeRankedShow as RelativeRankedShowType } from '../redux/store';
 
 function RelativeRankedShow({
   name,
