@@ -8,7 +8,7 @@ type hasArrayOfRelativeRankedShows = {
 
 function RankedShowList({ shows }: hasArrayOfRelativeRankedShows) {
   return (
-    <div className="max-w-xl m-5 mx-auto shadow-lg odd:bg-red-900">
+    <main className="max-w-xl m-5 mx-auto shadow-lg odd:bg-red-900">
       {shows.map(({ name, rank, percentileRank }) => (
         <RelativeRankedShowComponent
           key={name}
@@ -17,7 +17,7 @@ function RankedShowList({ shows }: hasArrayOfRelativeRankedShows) {
           percentileRank={Math.round(percentileRank * 1000) / 1000}
         />
       ))}
-    </div>
+    </main>
   );
 }
 
