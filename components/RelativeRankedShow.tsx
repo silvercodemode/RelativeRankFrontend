@@ -1,7 +1,7 @@
 import React from 'react';
 import { RelativeRankedShow as RelativeRankedShowType } from '../redux/store';
 
-function RelativeRankedShow({
+export default function RelativeRankedShow({
   name,
   rank,
   percentileRank,
@@ -18,5 +18,3 @@ function RelativeRankedShow({
     </div>
   );
 }
-
-export default RelativeRankedShow;

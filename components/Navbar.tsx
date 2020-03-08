@@ -19,7 +19,7 @@ export default function Navbar() {
             </a>
           </Link>
           {user && (
-            <Link href="users-show-list">
+            <Link href="show-list">
               <a className="block mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white mr-4">
                 Your List
               </a>

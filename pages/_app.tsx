@@ -1,21 +1,16 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { NextComponentType } from 'next';
 import PropTypes from 'prop-types';
 import '../styles/styles.css';
-import { AppContext, AppInitialProps, AppProps } from 'next/app';
 import { Provider } from 'react-redux';
 import store from '../redux/store';
 
-const App: NextComponentType<AppContext, AppInitialProps, AppProps> = ({
-  Component,
-  pageProps,
-}) => {
+function App({ Component, pageProps }) {
   return (
     <Provider store={store}>
       <Component {...pageProps} />
     </Provider>
   );
-};
+}
 
 App.propTypes = {
   Component: PropTypes.any.isRequired,

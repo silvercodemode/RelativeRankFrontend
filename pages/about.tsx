@@ -1,12 +1,11 @@
-import { NextPage } from 'next';
 import Navbar from '../components/Navbar';
 
-const About: NextPage<{ userAgent?: string }> = () => {
+export default function About() {
   return (
     <>
       <Navbar />
       <main className="max-w-xl m-5 mx-auto flex mx-auto flex-col">
-        <h2 className="text-center m-5 text-lg">Why another ranking site?</h2>
+        <h2 className="text-center m-5 text-2xl">Why another ranking site?</h2>
         <p className="m-2">
           The idea behind RelativeRank is to solve the problem of most people
           rating the majority of shows in the 6-8 and distribute rankings evenly
@@ -28,6 +27,4 @@ const About: NextPage<{ userAgent?: string }> = () => {
       </main>
     </>
   );
-};
-
-export default About;
+}

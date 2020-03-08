@@ -11,6 +11,7 @@ export interface RelativeRankedShow {
 
 export interface User {
   username: string;
+  token: string;
   showList: RelativeRankedShow[];
 }
 

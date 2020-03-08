@@ -6,9 +6,11 @@ type hasArrayOfRelativeRankedShows = {
   shows: RelativeRankedShow[];
 };
 
-function RankedShowList({ shows }: hasArrayOfRelativeRankedShows) {
+export default function RankedShowList({
+  shows,
+}: hasArrayOfRelativeRankedShows) {
   return (
-    <main className="max-w-xl m-5 mx-auto shadow-lg odd:bg-red-900">
+    <main className="max-w-xl m-5 mx-auto">
       {shows.map(({ name, rank, percentileRank }) => (
         <RelativeRankedShowComponent
           key={name}
@@ -20,5 +22,3 @@ function RankedShowList({ shows }: hasArrayOfRelativeRankedShows) {
     </main>
   );
 }
-
-export default RankedShowList;

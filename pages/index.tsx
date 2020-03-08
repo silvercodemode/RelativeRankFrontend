@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
-import { NextPage } from 'next';
 import { useDispatch, useSelector } from 'react-redux';
 import Navbar from '../components/Navbar';
 import RankedShowList from '../components/RankedShowList';
 import { fetchRelativeRankedShowListIfEmpty } from '../redux/action-creators';
 import { RelativeRankStore, RelativeRankedShow } from '../redux/store';
 
-const Home: NextPage<{ userAgent: string }> = () => {
+export default function Home() {
   const shows = useSelector<RelativeRankStore, RelativeRankedShow[]>(
     (state) => state.shows,
   );
@@ -22,6 +21,4 @@ const Home: NextPage<{ userAgent: string }> = () => {
       <RankedShowList shows={shows} />
     </>
   );
-};
-
-export default Home;
+}

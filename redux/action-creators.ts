@@ -1,4 +1,4 @@
-import { relativeRankedShowsEndpoint } from '../urls';
+import { relativeRankedShowsEndpoint, signUpEndpoint } from '../urls';
 import { RelativeRankStore, RelativeRankedShow } from './store';
 
 export const RECEIVE_RELATIVE_RANKED_SHOW_LIST =
@@ -30,3 +30,40 @@ export const fetchRelativeRankedShowListIfEmpty = () => (
     dispatch(fetchRelativeRankedShowList());
   }
 };
+
+export const SUCCESSFUL_SIGN_UP = 'SUCCESSFUL_SIGN_UP';
+
+export const successfulSignUp = (signUpResponse: SignUpResponse) => ({
+  type: SUCCESSFUL_SIGN_UP,
+  signUpResponse,
+});
+
+export const sendSignUpRequest = (signUpParams: SignUpParams) => async (
+  dispatch,
+) => {
+  const response = await fetch(signUpEndpoint, {
+    method: 'POST',
+    mode: 'cors',
+    cache: 'no-cache',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(signUpParams),
+  });
+  const signUpResponse: SignUpResponse = await response.json();
+  dispatch(successfulSignUp(signUpResponse));
+};
+
+export const signUp = (signUpParams: SignUpParams) => (dispatch) => {
+  dispatch(sendSignUpRequest(signUpParams));
+};
+
+export interface SignUpParams {
+  username: string;
+  password: string;
+}
+
+export interface SignUpResponse {
+  id: number;
+  username: string;
+  password: string;
+  token: string;
+}
