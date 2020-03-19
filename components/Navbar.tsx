@@ -1,10 +1,25 @@
 import React from 'react';
 import Link from 'next/link';
-import { useSelector } from 'react-redux';
+import { useRouter } from 'next/router';
+import { useSelector, useDispatch } from 'react-redux';
 import { RelativeRankStore, User } from '../redux/store';
+import { signOut } from '../redux/action-creators';
 
 export default function Navbar() {
   const user = useSelector<RelativeRankStore, User>((state) => state.user);
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  function signOutNav() {
+    dispatch(signOut());
+    router.push('/');
+  }
+
+  function signOutKeydown(event) {
+    if (event.key == 'Enter') {
+      signOutNav();
+    }
+  }
 
   return (
     <nav className="flex items-center justify-between flex-wrap bg-green-800 p-6">
@@ -35,18 +50,28 @@ export default function Navbar() {
           </Link>
         </div>
       </div>
-      <div className="w-full block text-lg lg:flex lg:flex-grow lg:justify-end lg:flex lg:items-center lg:w-auto">
-        <Link href="sign-up">
-          <a className="block mr-3 mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white">
-            Sign Up
-          </a>
-        </Link>
-        <Link href="login">
-          <a className="block mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white">
-            Login
-          </a>
-        </Link>
-      </div>
+      {!user ? (
+        <div className="w-full block text-lg lg:flex lg:flex-grow lg:justify-end lg:flex lg:items-center lg:w-auto">
+          <Link href="sign-up">
+            <a className="block mr-3 mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white">
+              Sign Up
+            </a>
+          </Link>
+          <Link href="login">
+            <a className="block mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white">
+              Login
+            </a>
+          </Link>
+        </div>
+      ) : (
+        <button type="button" onClick={signOutNav} onKeyDown={signOutKeydown}>
+          <Link href="">
+            <a className="block mr-3 mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white">
+              Sign Out
+            </a>
+          </Link>
+        </button>
+      )}
     </nav>
   );
 }

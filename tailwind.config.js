@@ -3,7 +3,8 @@ module.exports = {
     extend: {},
   },
   variants: {
-    backgroundColor: ['odd', 'hover'],
+    backgroundColor: ['odd', 'even', 'hover'],
+    textColor: ['even', 'hover', 'focus', 'group-hover'],
   },
   plugins: [],
 };

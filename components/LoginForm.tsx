@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
-import { signUp, resetSignUpOrLogin } from '../redux/action-creators';
+import { login, resetSignUpOrLogin } from '../redux/action-creators';
 import { RelativeRankStore } from '../redux/store';
 
-export default function SignUpForm() {
+export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const state = useSelector<RelativeRankStore, RelativeRankStore>((s) => s);
@@ -17,11 +17,11 @@ export default function SignUpForm() {
 
   if (state.signInFailed) {
     dispatch(resetSignUpOrLogin());
-    alert('Sign in failed');
+    alert('Login failed');
   }
 
   function submitForm() {
-    dispatch(signUp({ username, password }));
+    dispatch(login({ username, password }));
     setUsername('');
     setPassword('');
   }
@@ -35,7 +35,7 @@ export default function SignUpForm() {
   return (
     <main className="max-w-xl m-5 mx-auto mx-auto">
       <form className="m-5 shadow-md p-3 rounded-lg flex flex-col justify-center items-center">
-        <h2 className="text-center text-2xl">Sign Up</h2>
+        <h2 className="text-center text-2xl">Login</h2>
         <div className="flex-auto flex justify-between">
           <label htmlFor="username" className="text-lg m-2">
             Username

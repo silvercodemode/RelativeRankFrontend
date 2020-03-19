@@ -18,11 +18,13 @@ export interface User {
 export interface RelativeRankStore {
   user: User;
   shows: RelativeRankedShow[];
+  signInFailed: boolean;
 }
 
 export const defaultState: RelativeRankStore = {
   user: null,
   shows: [],
+  signInFailed: false,
 };
 
 const store: Store<RelativeRankStore> = createStore(

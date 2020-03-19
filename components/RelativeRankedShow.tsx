@@ -7,7 +7,7 @@ export default function RelativeRankedShow({
   percentileRank,
 }: RelativeRankedShowType) {
   return (
-    <div className="flex m-1 p-1 rounded-lg bg-green-200 odd:bg-gray-500">
+    <div className="flex m-1 p-2 rounded-lg shadow-md even:bg-green-800 even:text-white">
       <span className="flex-initial text-4xl">
         {rank}
         <span className="ml-1 text-xs">{percentileRank}</span>
