@@ -65,7 +65,7 @@ export default function Navbar() {
         </div>
       ) : (
         <button type="button" onClick={signOutNav} onKeyDown={signOutKeydown}>
-          <Link href="">
+          <Link href="index">
             <a className="block mr-3 mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white">
               Sign Out
             </a>
