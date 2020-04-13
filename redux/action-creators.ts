@@ -1,8 +1,10 @@
+import { debounce } from 'lodash';
 import {
   relativeRankedShowsEndpoint,
   signUpEndpoint,
   loginEndpoint,
   userShowlistUrlMaker,
+  searchUrlMaker,
 } from '../urls';
 import { RelativeRankStore, RelativeRankedShow } from './store';
 
@@ -140,3 +142,50 @@ export const fetchUserShowList = () => async (
   const showList: RelativeRankedShow[] = await response.json();
   dispatch(receiveShowList(showList));
 };
+
+export const updateUserShowList = (showList: RelativeRankedShow[]) => async (
+  dispatch,
+  getState: () => RelativeRankStore,
+) => {
+  const { username, token } = getState().user;
+
+  const response = await fetch(userShowlistUrlMaker(username), {
+    method: 'PUT',
+    mode: 'cors',
+    cache: 'no-cache',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      Username: username,
+      ShowList: showList,
+    }),
+  });
+
+  const updatedShowList: RelativeRankedShow[] = await response.json();
+  dispatch(receiveShowList(updatedShowList));
+};
+
+export const RECEIVE_SEARCH_RESULT = 'RECEIVE_SEARCH_RESULT';
+
+export interface ReceiveSearchResultAction {
+  type: typeof RECEIVE_SEARCH_RESULT;
+  searchResult: RelativeRankedShow[];
+}
+
+export const receiveSearchResult = (
+  searchResult: RelativeRankedShow[],
+): ReceiveSearchResultAction => ({
+  type: RECEIVE_SEARCH_RESULT,
+  searchResult,
+});
+
+export const search = (searchTerm: string) => async (dispatch) => {
+  const response = await fetch(searchUrlMaker(searchTerm));
+  const searchResult: RelativeRankedShow[] = await response.json();
+  console.log(searchResult);
+  dispatch(receiveSearchResult(searchResult));
+};
+
+export const debouncedSearch = debounce(search, 1000);

@@ -5,6 +5,7 @@ import {
   RESET_SIGN_UP_OR_LOGIN,
   SIGN_OUT,
   RECEIVE_USER_SHOW_LIST,
+  RECEIVE_SEARCH_RESULT,
 } from './action-creators';
 import { RelativeRankStore, defaultState } from './store';
 
@@ -48,6 +49,11 @@ export default function MainReducer(
           token: state.user.token,
           showList: action.showList,
         },
+      };
+    case RECEIVE_SEARCH_RESULT:
+      return {
+        ...state,
+        searchResult: action.searchResult,
       };
     default:
       return state;

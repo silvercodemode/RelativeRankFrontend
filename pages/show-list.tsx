@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import Navbar from '../components/Navbar';
 import UserShowList from '../components/UserShowList';
 import { fetchUserShowList } from '../redux/action-creators';
-import { RelativeRankStore, User } from '../redux/store';
+import { RelativeRankStore, User, RelativeRankedShow } from '../redux/store';
 
 export default function ShowList() {
   const user = useSelector<RelativeRankStore, User>((state) => state.user);
   const dispatch = useDispatch();
-  const [showList, setShowList] = useState([]);
+  const [showList, setShowList] = useState<RelativeRankedShow[]>([]);
   useEffect(() => {
     if (user) {
       dispatch(fetchUserShowList());
