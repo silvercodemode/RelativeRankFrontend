@@ -71,6 +71,8 @@ export const sendSignUpRequest = (signUpParams: SignUpParams) => async (
     });
     const signUpResponse: SignUpResponse = await response.json();
     dispatch(successfulSignUpOrLogin(signUpResponse));
+    localStorage.setItem('username', signUpResponse.username);
+    localStorage.setItem('token', signUpResponse.token);
   } catch (error) {
     dispatch(failedSignUpOrLogin(error));
   }
@@ -105,6 +107,8 @@ export const sendLoginRequest = (loginParams: SignUpParams) => async (
     });
     const signUpResponse: SignUpResponse = await response.json();
     dispatch(successfulSignUpOrLogin(signUpResponse));
+    localStorage.setItem('username', signUpResponse.username);
+    localStorage.setItem('token', signUpResponse.token);
   } catch (error) {
     dispatch(failedSignUpOrLogin(error));
   }
@@ -116,9 +120,12 @@ export const login = (loginParams: SignUpParams) => (dispatch) => {
 
 export const SIGN_OUT = 'SIGN_OUT';
 
-export const signOut = () => ({
-  type: SIGN_OUT,
-});
+export const signOut = () => {
+  localStorage.clear();
+  return {
+    type: SIGN_OUT,
+  };
+};
 
 export const RECEIVE_USER_SHOW_LIST = 'RECEIVE_USER_SHOW_LIST';
 

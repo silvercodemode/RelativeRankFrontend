@@ -8,8 +8,8 @@ export default function About() {
         <h2 className="text-center m-5 text-2xl">Why another ranking site?</h2>
         <p className="m-2">
           The idea behind RelativeRank is to solve the problem of most people
-          rating the majority of shows in the 6-8 and distribute rankings evenly
-          from 1-10.
+          rating the majority of shows in the 6-8 range and distribute rankings
+          evenly from 1-10.
         </p>
         <p className="m-2">
           The ranking system also aims to force shows to only be ranked relative

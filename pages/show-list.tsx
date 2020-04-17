@@ -12,10 +12,11 @@ export default function ShowList() {
   const [showList, setShowList] = useState<RelativeRankedShow[]>([]);
   useEffect(() => {
     if (user) {
+      console.log(user);
       dispatch(fetchUserShowList());
       setShowList(user && user.showList ? user.showList : []);
     }
-  }, [user ? (user.showList ? user.showList.length : user.showList) : null]);
+  }, [user ? (user.showList ? user.showList.length : user.showList) : user]);
 
   return (
     <>

@@ -36,6 +36,7 @@ export default function UserShowList({
 }: showsAndUpdateShows) {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchResults, setSearchResults] = useState<RelativeRankedShow[]>([]);
+  const [searchExecuted, setSearchExecuted] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   function onDragEnd({ source, destination }: dragResult) {
@@ -61,73 +62,137 @@ export default function UserShowList({
   }
 
   function addShow(showName) {
+    if (shows.some((show) => show.name === showName)) {
+      return;
+    }
     const newShow: RelativeRankedShow = {
       name: showName,
-      rank: 1,
-      percentileRank: 1,
+      rank: 0,
+      percentileRank: 0,
     };
-    const updatedShows = [newShow, ...shows];
+    const updatedShows = [newShow, ...shows].map((show, i) => ({
+      name: show.name,
+      rank: i + 1,
+      percentileRank: 1 - (1 / (shows.length + 2)) * (i + 1),
+    }));
     setShowList(updatedShows);
+  }
+
+  function deleteShow(showName) {
+    if (!shows.some((show) => show.name === showName)) {
+      return;
+    }
+
+    const updatedShows = shows
+      .filter((show) => show.name !== showName)
+      .map((show, i) => ({
+        name: show.name,
+        rank: i + 1,
+        percentileRank: 1 - (1 / shows.length) * (i + 1),
+      }));
+    setShowList(updatedShows);
+  }
+
+  function clearSearchResults() {
+    setSearchResults([]);
+    setSearchExecuted(false);
+  }
+
+  function sendSearch() {
+    if (searchTerm.length > 0) {
+      search(searchTerm).then((res) => {
+        setSearchResults(res);
+        setSearchExecuted(true);
+      });
+    }
+  }
+
+  function onKeyPress(event) {
+    if (event.key === 'Enter') {
+      sendSearch();
+    }
   }
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="user-show-list">
         {(provided) => (
-          <main className="max-w-xl m-5 mx-auto" ref={provided.innerRef}>
-            <div className="pl-5 pr-5 flex content-center justify-between">
-              <label htmlFor="search" className="text-lg m-2">
-                Search
-              </label>
-              <input
-                id="search"
-                type="text"
-                value={searchTerm}
-                className="flex-grow border-solid border-4 m-2 p-1 rounded focus:outline-none focus:shadow-outline"
-                onChange={(event) => setSearchTerm(event.target.value)}
-                onKeyPress={() => console.log('hi')}
-              />
-              <button
-                type="button"
-                className="m-2 max-w-xs bg-green-800 hover:bg-green-700 text-white text-lg py-2 px-4 rounded flex-grow-0"
-                onClick={() =>
-                  search(searchTerm).then((res) => setSearchResults(res))
-                }
-              >
-                Search
-              </button>
-            </div>
-            {searchResults.length > 0 &&
-              searchResults.map((show: RelativeRankedShow) => (
-                <div key={show.name}>
-                  <p>{show.name}</p>
+          <main
+            className="max-w-xl m-5 mx-auto text-center"
+            ref={provided.innerRef}
+          >
+            <div className="rounded-lg shadow-md my-2 py-2">
+              <h4>Add Show</h4>
+              <div className="pl-5 pr-5 flex flex-wrap content-center justify-between">
+                <label htmlFor="search" className="text-lg m-2 pt-2">
+                  Search
+                </label>
+                <input
+                  id="search"
+                  type="text"
+                  value={searchTerm}
+                  className="flex-grow border-solid border-4 m-2 p-1 rounded focus:outline-none focus:shadow-outline"
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  onKeyPress={onKeyPress}
+                />
+                <div className="text-center min-w-full sm:min-w-0">
                   <button
                     type="button"
                     className="m-2 max-w-xs bg-green-800 hover:bg-green-700 text-white text-lg py-2 px-4 rounded flex-grow-0"
-                    onClick={() => addShow(show.name)}
+                    onClick={sendSearch}
                   >
-                    Add Show
+                    Search
                   </button>
                 </div>
-              ))}
+              </div>
+              {searchExecuted && (
+                <>
+                  <button
+                    type="button"
+                    className="mx-auto p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
+                    onClick={clearSearchResults}
+                  >
+                    Clear Search Results
+                  </button>
+                  {searchResults.map && searchResults.length < 1 ? (
+                    <p>No shows matched your search.</p>
+                  ) : (
+                    searchResults.map((show: RelativeRankedShow) => (
+                      <div
+                        key={show.name}
+                        className="flex justify-between pl-5 pr-5"
+                      >
+                        <p className="pt-2">{show.name}</p>
+                        <button
+                          type="button"
+                          className="m-2 p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
+                          onClick={() => addShow(show.name)}
+                        >
+                          Add
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </>
+              )}
+            </div>
             <div className="pl-5 pr-5 flex content-center justify-between">
-              <p className="mt-3 text-lg">
-                Drag and drop to reorder your show list.
+              <p className="mt-3 text-lg text-left">
+                Drag and drop to reorder list.
               </p>
               <button
                 type="button"
                 className="m-2 max-w-xs bg-green-800 hover:bg-green-700 text-white text-lg py-2 px-4 rounded flex-grow-0"
                 onClick={() => dispatch(updateUserShowList(shows))}
               >
-                Save Changes
+                Save
               </button>
             </div>
-            {shows.map(({ name, rank, percentileRank }) => (
+            {shows.map((show) => (
               <DraggableRankedShow
-                key={name}
-                name={name}
-                rank={rank}
-                percentileRank={Math.round(percentileRank * 1000) / 1000}
+                key={show.name}
+                show={show}
+                updator={deleteShow}
               />
             ))}
             {provided.placeholder}

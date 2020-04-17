@@ -1,14 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
 import { RelativeRankStore, User } from '../redux/store';
-import { signOut } from '../redux/action-creators';
+import { signOut, successfulSignUpOrLogin } from '../redux/action-creators';
 
 export default function Navbar() {
   const user = useSelector<RelativeRankStore, User>((state) => state.user);
   const dispatch = useDispatch();
   const router = useRouter();
+  useEffect(() => {
+    if (user === null) {
+      const usernameFromLocalStorage = localStorage.getItem('username');
+      const tokenFromLocalStorage = localStorage.getItem('token');
+
+      const defaultUser =
+        usernameFromLocalStorage && tokenFromLocalStorage
+          ? {
+              username: usernameFromLocalStorage,
+              token: tokenFromLocalStorage,
+              showList: null,
+            }
+          : null;
+      console.log('in nav read local storage effect');
+      if (defaultUser) {
+        dispatch(
+          successfulSignUpOrLogin({
+            id: null,
+            username: defaultUser.username,
+            password: null,
+            token: defaultUser.token,
+          }),
+        );
+      }
+    }
+  }, [user ? user.username : null]);
 
   function signOutNav() {
     dispatch(signOut());
