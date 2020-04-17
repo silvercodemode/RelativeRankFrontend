@@ -191,7 +191,6 @@ export const receiveSearchResult = (
 export const search = (searchTerm: string) => async (dispatch) => {
   const response = await fetch(searchUrlMaker(searchTerm));
   const searchResult: RelativeRankedShow[] = await response.json();
-  console.log(searchResult);
   dispatch(receiveSearchResult(searchResult));
 };
 

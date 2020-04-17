@@ -26,7 +26,6 @@ type showsAndUpdateShows = {
 async function search(searchTerm) {
   const response = await fetch(searchUrlMaker(searchTerm));
   const searchResult: RelativeRankedShow[] = await response.json();
-  console.log(searchResult);
   return searchResult;
 }
 
