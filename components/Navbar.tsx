@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
@@ -22,7 +22,7 @@ export default function Navbar() {
               showList: null,
             }
           : null;
-      console.log('in nav read local storage effect');
+
       if (defaultUser) {
         dispatch(
           successfulSignUpOrLogin({
@@ -42,7 +42,7 @@ export default function Navbar() {
   }
 
   function signOutKeydown(event) {
-    if (event.key == 'Enter') {
+    if (event.key === 'Enter') {
       signOutNav();
     }
   }
@@ -54,7 +54,7 @@ export default function Navbar() {
       </header>
       <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
         <div className="text-lg lg:flex-grow">
-          <Link href="index">
+          <Link href="/">
             <a className="block mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white mr-4">
               Home
             </a>
