@@ -34,7 +34,7 @@ export default function DraggableRankedShow({
               <span className="text-xl">{name}</span>
               <button
                 type="button"
-                className="p-2 ml-2 mt-2 rounded-lg shadow-inner hover:shadow-md"
+                className="p-1 ml-2 rounded-lg shadow-inner hover:shadow-md"
                 onClick={() => updator(name)}
               >
                 Delete
