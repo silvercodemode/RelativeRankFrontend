@@ -27,7 +27,9 @@ export default function Home() {
           <LoadingSpinner />
         </div>
       ) : (
-        <RankedShowList shows={shows} />
+        <RankedShowList
+          shows={shows.map((show, i) => ({ ...show, rank: i + 1 }))}
+        />
       )}
     </>
   );

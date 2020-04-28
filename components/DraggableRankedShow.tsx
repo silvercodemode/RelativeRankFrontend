@@ -26,7 +26,9 @@ export default function DraggableRankedShow({
           <div className="flex m-1 p-2">
             <span className="flex-initial text-4xl">
               {rank}
-              <span className="ml-1 text-xs">{percentileRank}</span>
+              <span className="ml-1 text-xs">
+                {Math.round(percentileRank * 1000) / 1000}
+              </span>
             </span>
             <div className="flex flex-1 justify-end">
               <span className="text-4xl">{name}</span>
