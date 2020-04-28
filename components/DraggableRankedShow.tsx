@@ -24,14 +24,14 @@ export default function DraggableRankedShow({
           className="rounded-lg shadow-md even:bg-green-800 even:text-white"
         >
           <div className="flex m-1 p-2">
-            <span className="flex-initial text-4xl">
+            <span className="flex-initial text-xl">
               {rank}
               <span className="ml-1 text-xs">
                 {Math.round(percentileRank * 1000) / 1000}
               </span>
             </span>
             <div className="flex flex-1 justify-end">
-              <span className="text-4xl">{name}</span>
+              <span className="text-xl">{name}</span>
               <button
                 type="button"
                 className="p-2 ml-2 mt-2 rounded-lg shadow-inner hover:shadow-md"
