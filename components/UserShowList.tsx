@@ -1,11 +1,15 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { RelativeRankedShow } from '../redux/store';
-import { updateUserShowList } from '../redux/action-creators';
+import { RelativeRankedShow, RelativeRankStore } from '../redux/store';
+import {
+  updateUserShowList,
+  search,
+  clearSearchResults,
+} from '../redux/action-creators';
 import DraggableRankedShow from './DraggableRankedShow';
-import { searchUrlMaker } from '../urls';
+import LoadingSpinner from './LoadingSpinner';
 
 type dropppableLocation = {
   droppableId: string;
@@ -23,19 +27,24 @@ type showsAndUpdateShows = {
   setShowList: (shows: RelativeRankedShow[]) => void;
 };
 
-async function search(searchTerm) {
-  const response = await fetch(searchUrlMaker(searchTerm));
-  const searchResult: RelativeRankedShow[] = await response.json();
-  return searchResult;
-}
-
 export default function UserShowList({
   shows,
   setShowList,
 }: showsAndUpdateShows) {
+  const userShowsLoading = useSelector<RelativeRankStore, boolean>(
+    (state) => state.isFetchingUserShows,
+  );
+  const searchResultsLoading = useSelector<RelativeRankStore, boolean>(
+    (state) => state.isFetchingSearchResults,
+  );
+  const searchResults = useSelector<RelativeRankStore, RelativeRankedShow[]>(
+    (state) => state.searchResults,
+  );
+  const searchExecuted = useSelector<RelativeRankStore, boolean>(
+    (state) => state.searchWasExecuted,
+  );
+
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<RelativeRankedShow[]>([]);
-  const [searchExecuted, setSearchExecuted] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   function onDragEnd({ source, destination }: dragResult) {
@@ -92,17 +101,13 @@ export default function UserShowList({
     setShowList(updatedShows);
   }
 
-  function clearSearchResults() {
-    setSearchResults([]);
-    setSearchExecuted(false);
+  function clearSearch() {
+    dispatch(clearSearchResults());
   }
 
   function sendSearch() {
     if (searchTerm.length > 0) {
-      search(searchTerm).then((res) => {
-        setSearchResults(res);
-        setSearchExecuted(true);
-      });
+      dispatch(search(searchTerm));
     }
   }
 
@@ -144,36 +149,41 @@ export default function UserShowList({
                   </button>
                 </div>
               </div>
-              {searchExecuted && (
-                <>
-                  <button
-                    type="button"
-                    className="mx-auto p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
-                    onClick={clearSearchResults}
-                  >
-                    Clear Search Results
-                  </button>
-                  {searchResults.map && searchResults.length < 1 ? (
-                    <p>No shows matched your search.</p>
-                  ) : (
-                    searchResults.map((show: RelativeRankedShow) => (
-                      <div
-                        key={show.name}
-                        className="flex justify-between pl-5 pr-5"
-                      >
-                        <p className="pt-2">{show.name}</p>
-                        <button
-                          type="button"
-                          className="m-2 p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
-                          onClick={() => addShow(show.name)}
+              {(searchExecuted || searchResultsLoading) &&
+                (searchResultsLoading ? (
+                  <div className="mb-4">
+                    <LoadingSpinner />
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="mx-auto p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
+                      onClick={clearSearch}
+                    >
+                      Clear Search Results
+                    </button>
+                    {searchResults.map && searchResults.length < 1 ? (
+                      <p>No shows matched your search.</p>
+                    ) : (
+                      searchResults.map((show: RelativeRankedShow) => (
+                        <div
+                          key={show.name}
+                          className="flex justify-between pl-5 pr-5"
                         >
-                          Add
-                        </button>
-                      </div>
-                    ))
-                  )}
-                </>
-              )}
+                          <p className="pt-2">{show.name}</p>
+                          <button
+                            type="button"
+                            className="m-2 p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
+                            onClick={() => addShow(show.name)}
+                          >
+                            Add
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </>
+                ))}
             </div>
             <div className="pl-5 pr-5 flex content-center justify-between">
               <p className="mt-3 text-lg text-left">
@@ -187,13 +197,19 @@ export default function UserShowList({
                 Save
               </button>
             </div>
-            {shows.map((show) => (
-              <DraggableRankedShow
-                key={show.name}
-                show={show}
-                updator={deleteShow}
-              />
-            ))}
+            {userShowsLoading ? (
+              <div className="mt-20">
+                <LoadingSpinner />
+              </div>
+            ) : (
+              shows.map((show) => (
+                <DraggableRankedShow
+                  key={show.name}
+                  show={show}
+                  updator={deleteShow}
+                />
+              ))
+            )}
             {provided.placeholder}
           </main>
         )}

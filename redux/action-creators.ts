@@ -8,12 +8,26 @@ import {
 } from '../urls';
 import { RelativeRankStore, RelativeRankedShow } from './store';
 
+export const START_FETCHING_RELATIVE_RANKED_SHOW_LIST =
+  'START_FETCHING_RELATIVE_RANKED_SHOW_LIST';
+
+export interface StartFetchingRelativeRankedShowListAction {
+  type: typeof START_FETCHING_RELATIVE_RANKED_SHOW_LIST;
+  isFetchingShows: boolean;
+}
+
+export const startFetchingRelativeRankedShowList = (): StartFetchingRelativeRankedShowListAction => ({
+  type: START_FETCHING_RELATIVE_RANKED_SHOW_LIST,
+  isFetchingShows: true,
+});
+
 export const RECEIVE_RELATIVE_RANKED_SHOW_LIST =
   'RECEIVE_RELATIVE_RANKED_SHOW_LIST';
 
 export interface ReceiveRelativeRankedShowListAction {
   type: typeof RECEIVE_RELATIVE_RANKED_SHOW_LIST;
   shows: RelativeRankedShow[];
+  isFetchingShows: boolean;
 }
 
 export const receiveRelativeRankedShowList = (
@@ -21,12 +35,18 @@ export const receiveRelativeRankedShowList = (
 ): ReceiveRelativeRankedShowListAction => ({
   type: RECEIVE_RELATIVE_RANKED_SHOW_LIST,
   shows,
+  isFetchingShows: false,
 });
 
 export const fetchRelativeRankedShowList = () => async (dispatch) => {
-  const response = await fetch(relativeRankedShowsEndpoint);
-  const showList: RelativeRankedShow[] = await response.json();
-  dispatch(receiveRelativeRankedShowList(showList));
+  dispatch(startFetchingRelativeRankedShowList());
+  let showList: RelativeRankedShow[] = null;
+  try {
+    const response = await fetch(relativeRankedShowsEndpoint);
+    showList = await response.json();
+  } finally {
+    dispatch(receiveRelativeRankedShowList(showList));
+  }
 };
 
 export const fetchRelativeRankedShowListIfEmpty = () => (
@@ -127,11 +147,24 @@ export const signOut = () => {
   };
 };
 
+export const START_FETCHING_USER_SHOW_LIST = 'START_FETCHING_USER_SHOW_LIST';
+
+export interface StartFetchingUserShowListAction {
+  type: typeof START_FETCHING_USER_SHOW_LIST;
+  isFetchingUserShows: boolean;
+}
+
+export const startFetchingUserShowList = (): StartFetchingUserShowListAction => ({
+  type: START_FETCHING_USER_SHOW_LIST,
+  isFetchingUserShows: true,
+});
+
 export const RECEIVE_USER_SHOW_LIST = 'RECEIVE_USER_SHOW_LIST';
 
 export interface ReceiveShowListAction {
   type: typeof RECEIVE_USER_SHOW_LIST;
   showList: RelativeRankedShow[];
+  isFetchingUserShows: boolean;
 }
 
 export const receiveShowList = (
@@ -139,15 +172,23 @@ export const receiveShowList = (
 ): ReceiveShowListAction => ({
   type: RECEIVE_USER_SHOW_LIST,
   showList,
+  isFetchingUserShows: false,
 });
 
 export const fetchUserShowList = () => async (
   dispatch,
   getState: () => RelativeRankStore,
 ) => {
-  const response = await fetch(userShowlistUrlMaker(getState().user.username));
-  const showList: RelativeRankedShow[] = await response.json();
-  dispatch(receiveShowList(showList));
+  dispatch(startFetchingUserShowList());
+  let showList: RelativeRankedShow[] = null;
+  try {
+    const response = await fetch(
+      userShowlistUrlMaker(getState().user.username),
+    );
+    showList = await response.json();
+  } finally {
+    dispatch(receiveShowList(showList));
+  }
 };
 
 export const updateUserShowList = (showList: RelativeRankedShow[]) => async (
@@ -174,11 +215,25 @@ export const updateUserShowList = (showList: RelativeRankedShow[]) => async (
   dispatch(receiveShowList(updatedShowList));
 };
 
+export const START_SEARCH = 'START_SEARCH';
+
+export interface StartSearch {
+  type: typeof START_SEARCH;
+  isFetchingSearchResults: boolean;
+}
+
+export const startSearch = (): StartSearch => ({
+  type: START_SEARCH,
+  isFetchingSearchResults: true,
+});
+
 export const RECEIVE_SEARCH_RESULT = 'RECEIVE_SEARCH_RESULT';
 
 export interface ReceiveSearchResultAction {
   type: typeof RECEIVE_SEARCH_RESULT;
   searchResult: RelativeRankedShow[];
+  isFetchingSearchResults: boolean;
+  searchWasExecuted: boolean;
 }
 
 export const receiveSearchResult = (
@@ -186,12 +241,33 @@ export const receiveSearchResult = (
 ): ReceiveSearchResultAction => ({
   type: RECEIVE_SEARCH_RESULT,
   searchResult,
+  isFetchingSearchResults: false,
+  searchWasExecuted: true,
 });
 
 export const search = (searchTerm: string) => async (dispatch) => {
-  const response = await fetch(searchUrlMaker(searchTerm));
-  const searchResult: RelativeRankedShow[] = await response.json();
-  dispatch(receiveSearchResult(searchResult));
+  let searchResult: RelativeRankedShow[] = null;
+  dispatch(startSearch());
+  try {
+    const response = await fetch(searchUrlMaker(searchTerm));
+    searchResult = await response.json();
+  } finally {
+    dispatch(receiveSearchResult(searchResult));
+  }
 };
 
 export const debouncedSearch = debounce(search, 1000);
+
+export const CLEAR_SEARCH_RESULTS = 'CLEAR_SEARCH_RESULTS';
+
+export interface ClearSearchResults {
+  type: typeof CLEAR_SEARCH_RESULTS;
+  searchResult: RelativeRankedShow[];
+  searchWasExecuted: boolean;
+}
+
+export const clearSearchResults = (): ClearSearchResults => ({
+  type: CLEAR_SEARCH_RESULTS,
+  searchResult: [],
+  searchWasExecuted: false,
+});

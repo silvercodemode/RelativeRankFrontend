@@ -19,14 +19,22 @@ export interface RelativeRankStore {
   user: User;
   shows: RelativeRankedShow[];
   signInFailed: boolean;
-  searchResult: RelativeRankedShow[];
+  searchResults: RelativeRankedShow[];
+  searchWasExecuted: boolean;
+  isFetchingShows: boolean;
+  isFetchingUserShows: boolean;
+  isFetchingSearchResults: boolean;
 }
 
 export const defaultState: RelativeRankStore = {
   user: null,
   shows: [],
   signInFailed: false,
-  searchResult: [],
+  searchResults: [],
+  searchWasExecuted: false,
+  isFetchingShows: false,
+  isFetchingUserShows: false,
+  isFetchingSearchResults: false,
 };
 
 const store: Store<RelativeRankStore> = createStore(
