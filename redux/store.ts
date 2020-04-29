@@ -15,9 +15,18 @@ export interface User {
   showList: RelativeRankedShow[];
 }
 
+export interface PagedShowList {
+  page: number;
+  pageSize: number;
+  numberOfPages: number;
+  results: RelativeRankedShow[];
+}
+
 export interface RelativeRankStore {
   user: User;
   shows: RelativeRankedShow[];
+  page: number;
+  numberOfPages: number;
   signInFailed: boolean;
   searchResults: RelativeRankedShow[];
   searchWasExecuted: boolean;
@@ -29,6 +38,8 @@ export interface RelativeRankStore {
 export const defaultState: RelativeRankStore = {
   user: null,
   shows: [],
+  page: 1,
+  numberOfPages: 1,
   signInFailed: false,
   searchResults: [],
   searchWasExecuted: false,

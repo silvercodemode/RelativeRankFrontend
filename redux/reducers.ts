@@ -24,7 +24,9 @@ export default function MainReducer(
     case RECEIVE_RELATIVE_RANKED_SHOW_LIST:
       return {
         ...state,
-        shows: action.shows,
+        shows: action.shows.results,
+        page: action.shows.page,
+        numberOfPages: action.shows.numberOfPages,
         isFetchingShows: action.isFetchingShows,
       };
     case SUCCESSFUL_SIGN_UP_OR_LOGIN:

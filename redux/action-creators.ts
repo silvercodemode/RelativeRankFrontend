@@ -6,7 +6,7 @@ import {
   userShowlistUrlMaker,
   searchUrlMaker,
 } from '../urls';
-import { RelativeRankStore, RelativeRankedShow } from './store';
+import { RelativeRankStore, RelativeRankedShow, PagedShowList } from './store';
 
 export const START_FETCHING_RELATIVE_RANKED_SHOW_LIST =
   'START_FETCHING_RELATIVE_RANKED_SHOW_LIST';
@@ -26,26 +26,31 @@ export const RECEIVE_RELATIVE_RANKED_SHOW_LIST =
 
 export interface ReceiveRelativeRankedShowListAction {
   type: typeof RECEIVE_RELATIVE_RANKED_SHOW_LIST;
-  shows: RelativeRankedShow[];
+  shows: PagedShowList;
+  page: number;
   isFetchingShows: boolean;
 }
 
 export const receiveRelativeRankedShowList = (
-  shows: RelativeRankedShow[],
+  shows: PagedShowList,
+  page: number,
 ): ReceiveRelativeRankedShowListAction => ({
   type: RECEIVE_RELATIVE_RANKED_SHOW_LIST,
   shows,
+  page,
   isFetchingShows: false,
 });
 
-export const fetchRelativeRankedShowList = () => async (dispatch) => {
+export const fetchRelativeRankedShowList = (page: number) => async (
+  dispatch,
+) => {
   dispatch(startFetchingRelativeRankedShowList());
-  let showList: RelativeRankedShow[] = null;
+  let showList: PagedShowList = null;
   try {
-    const response = await fetch(relativeRankedShowsEndpoint);
+    const response = await fetch(`${relativeRankedShowsEndpoint}?page=${page}`);
     showList = await response.json();
   } finally {
-    dispatch(receiveRelativeRankedShowList(showList));
+    dispatch(receiveRelativeRankedShowList(showList, page));
   }
 };
 
@@ -54,7 +59,7 @@ export const fetchRelativeRankedShowListIfEmpty = () => (
   getState: () => RelativeRankStore,
 ) => {
   if (getState().shows.length < 1) {
-    dispatch(fetchRelativeRankedShowList());
+    dispatch(fetchRelativeRankedShowList(1));
   }
 };
 
