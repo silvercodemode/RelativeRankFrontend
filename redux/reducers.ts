@@ -17,7 +17,6 @@ export default function MainReducer(
   state = defaultState,
   action,
 ): RelativeRankStore {
-  console.log(action.type);
   switch (action.type) {
     case START_FETCHING_RELATIVE_RANKED_SHOW_LIST:
       return { ...state, isFetchingShows: action.isFetchingShows };

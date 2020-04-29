@@ -69,7 +69,7 @@ export default function UserShowList({
     }
   }
 
-  function addShow(showName) {
+  function addShowToTop(showName) {
     if (shows.some((show) => show.name === showName)) {
       return;
     }
@@ -79,6 +79,23 @@ export default function UserShowList({
       percentileRank: 0,
     };
     const updatedShows = [newShow, ...shows].map((show, i) => ({
+      name: show.name,
+      rank: i + 1,
+      percentileRank: 1 - (1 / (shows.length + 2)) * (i + 1),
+    }));
+    setShowList(updatedShows);
+  }
+
+  function addShowToBottom(showName) {
+    if (shows.some((show) => show.name === showName)) {
+      return;
+    }
+    const newShow: RelativeRankedShow = {
+      name: showName,
+      rank: 0,
+      percentileRank: 0,
+    };
+    const updatedShows = [...shows, newShow].map((show, i) => ({
       name: show.name,
       rank: i + 1,
       percentileRank: 1 - (1 / (shows.length + 2)) * (i + 1),
@@ -171,14 +188,23 @@ export default function UserShowList({
                           key={show.name}
                           className="flex justify-between pl-5 pr-5"
                         >
-                          <p className="pt-2">{show.name}</p>
-                          <button
-                            type="button"
-                            className="m-2 p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
-                            onClick={() => addShow(show.name)}
-                          >
-                            Add
-                          </button>
+                          <p className="pt-2 max-w-xs">{show.name}</p>
+                          <div>
+                            <button
+                              type="button"
+                              className="m-2 p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
+                              onClick={() => addShowToTop(show.name)}
+                            >
+                              Add To Top
+                            </button>
+                            <button
+                              type="button"
+                              className="m-2 p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
+                              onClick={() => addShowToBottom(show.name)}
+                            >
+                              Add To Bottom
+                            </button>
+                          </div>
                         </div>
                       ))
                     )}
@@ -202,13 +228,41 @@ export default function UserShowList({
                 <LoadingSpinner />
               </div>
             ) : (
-              shows.map((show) => (
-                <DraggableRankedShow
-                  key={show.name}
-                  show={show}
-                  updator={deleteShow}
-                />
-              ))
+              <>
+                <div className="max-w-xl mb-5 mx-auto text-center">
+                  <button
+                    type="button"
+                    className="p-2 rounded-lg shadow-md"
+                    onClick={() => {
+                      window.scrollTo({
+                        top: document.body.scrollHeight,
+                      });
+                    }}
+                  >
+                    Go To Bottom
+                  </button>
+                </div>
+                {shows.map((show) => (
+                  <DraggableRankedShow
+                    key={show.name}
+                    show={show}
+                    updator={deleteShow}
+                  />
+                ))}
+                <footer className="max-w-xl m-5 mx-auto text-center">
+                  <button
+                    type="button"
+                    className="m-4 p-2 rounded-lg shadow-md"
+                    onClick={() => {
+                      window.scrollTo({
+                        top: 0,
+                      });
+                    }}
+                  >
+                    Back to Top
+                  </button>
+                </footer>
+              </>
             )}
             {provided.placeholder}
           </main>
