@@ -33,6 +33,7 @@ export interface RelativeRankStore {
   isFetchingShows: boolean;
   isFetchingUserShows: boolean;
   isFetchingSearchResults: boolean;
+  attemptingSignUpOrLogin: boolean;
 }
 
 export const defaultState: RelativeRankStore = {
@@ -46,6 +47,7 @@ export const defaultState: RelativeRankStore = {
   isFetchingShows: false,
   isFetchingUserShows: false,
   isFetchingSearchResults: false,
+  attemptingSignUpOrLogin: false,
 };
 
 const store: Store<RelativeRankStore> = createStore(

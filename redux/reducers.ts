@@ -1,6 +1,7 @@
 import {
   START_FETCHING_RELATIVE_RANKED_SHOW_LIST,
   RECEIVE_RELATIVE_RANKED_SHOW_LIST,
+  START_SIGN_UP_OR_LOGIN,
   SUCCESSFUL_SIGN_UP_OR_LOGIN,
   FAILED_SIGN_UP_OR_LOGIN,
   RESET_SIGN_UP_OR_LOGIN,
@@ -28,9 +29,15 @@ export default function MainReducer(
         numberOfPages: action.shows.numberOfPages,
         isFetchingShows: action.isFetchingShows,
       };
+    case START_SIGN_UP_OR_LOGIN:
+      return {
+        ...state,
+        attemptingSignUpOrLogin: action.attemptingSignUpOrLogin,
+      };
     case SUCCESSFUL_SIGN_UP_OR_LOGIN:
       return {
         ...state,
+        attemptingSignUpOrLogin: action.attemptingSignUpOrLogin,
         user: {
           username: action.signUpResponse.username,
           token: action.signUpResponse.token,
@@ -40,6 +47,7 @@ export default function MainReducer(
     case FAILED_SIGN_UP_OR_LOGIN:
       return {
         ...state,
+        attemptingSignUpOrLogin: action.attemptingSignUpOrLogin,
         signInFailed: true,
       };
     case RESET_SIGN_UP_OR_LOGIN:

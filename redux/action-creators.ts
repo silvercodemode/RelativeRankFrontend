@@ -63,18 +63,46 @@ export const fetchRelativeRankedShowListIfEmpty = () => (
   }
 };
 
+export const START_SIGN_UP_OR_LOGIN = 'ATTEMPT_SIGN_UP_OR_LOGIN';
+
+interface StartSignUpOrLoginAction {
+  type: typeof START_SIGN_UP_OR_LOGIN;
+  attemptingSignUpOrLogin: boolean;
+}
+
+export const startSignUpOrLogin = (): StartSignUpOrLoginAction => ({
+  type: START_SIGN_UP_OR_LOGIN,
+  attemptingSignUpOrLogin: true,
+});
+
 export const SUCCESSFUL_SIGN_UP_OR_LOGIN = 'SUCCESSFUL_SIGN_UP_OR_LOGIN';
 
-export const successfulSignUpOrLogin = (signUpResponse: SignUpResponse) => ({
+interface SuccessfulSignUpOrLoginAction {
+  type: typeof SUCCESSFUL_SIGN_UP_OR_LOGIN;
+  signUpResponse: SignUpResponse;
+  attemptingSignUpOrLogin: boolean;
+}
+
+export const successfulSignUpOrLogin = (
+  signUpResponse: SignUpResponse,
+): SuccessfulSignUpOrLoginAction => ({
   type: SUCCESSFUL_SIGN_UP_OR_LOGIN,
   signUpResponse,
+  attemptingSignUpOrLogin: false,
 });
 
 export const FAILED_SIGN_UP_OR_LOGIN = 'FAILED_SIGN_UP_OR_LOGIN';
 
-export const failedSignUpOrLogin = (error) => ({
+interface FailedSignUpOrLoginAction {
+  type: typeof FAILED_SIGN_UP_OR_LOGIN;
+  error;
+  attemptingSignUpOrLogin: boolean;
+}
+
+export const failedSignUpOrLogin = (error): FailedSignUpOrLoginAction => ({
   type: FAILED_SIGN_UP_OR_LOGIN,
   error,
+  attemptingSignUpOrLogin: false,
 });
 
 export const RESET_SIGN_UP_OR_LOGIN = 'RESET_SIGN_UP_OR_LOGIN';
@@ -87,6 +115,8 @@ export const sendSignUpRequest = (signUpParams: SignUpParams) => async (
   dispatch,
 ) => {
   try {
+    dispatch(startSignUpOrLogin());
+
     const response = await fetch(signUpEndpoint, {
       method: 'POST',
       mode: 'cors',
@@ -94,10 +124,17 @@ export const sendSignUpRequest = (signUpParams: SignUpParams) => async (
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(signUpParams),
     });
+
     const signUpResponse: SignUpResponse = await response.json();
-    dispatch(successfulSignUpOrLogin(signUpResponse));
-    localStorage.setItem('username', signUpResponse.username);
-    localStorage.setItem('token', signUpResponse.token);
+
+    if (response.ok) {
+      dispatch(successfulSignUpOrLogin(signUpResponse));
+
+      localStorage.setItem('username', signUpResponse.username);
+      localStorage.setItem('token', signUpResponse.token);
+    } else {
+      dispatch(failedSignUpOrLogin(response.statusText));
+    }
   } catch (error) {
     dispatch(failedSignUpOrLogin(error));
   }
@@ -123,6 +160,8 @@ export const sendLoginRequest = (loginParams: SignUpParams) => async (
   dispatch,
 ) => {
   try {
+    dispatch(startSignUpOrLogin());
+
     const response = await fetch(loginEndpoint, {
       method: 'POST',
       mode: 'cors',
@@ -130,10 +169,17 @@ export const sendLoginRequest = (loginParams: SignUpParams) => async (
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(loginParams),
     });
+
     const signUpResponse: SignUpResponse = await response.json();
-    dispatch(successfulSignUpOrLogin(signUpResponse));
-    localStorage.setItem('username', signUpResponse.username);
-    localStorage.setItem('token', signUpResponse.token);
+
+    if (response.ok) {
+      dispatch(successfulSignUpOrLogin(signUpResponse));
+
+      localStorage.setItem('username', signUpResponse.username);
+      localStorage.setItem('token', signUpResponse.token);
+    } else {
+      dispatch(failedSignUpOrLogin(response.statusText));
+    }
   } catch (error) {
     dispatch(failedSignUpOrLogin(error));
   }
