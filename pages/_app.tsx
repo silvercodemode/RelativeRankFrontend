@@ -10,6 +10,10 @@ function App({ Component, pageProps }) {
     <Provider store={store}>
       <Head>
         <title>Relative Rank</title>
+        <meta
+          name="Description"
+          content="Rank anime relative to individual preference then map that to a global scale."
+        />
         <link rel="icon" href="/images/favicon.ico" />
         <link
           rel="apple-touch-icon"
