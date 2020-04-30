@@ -23,7 +23,7 @@ export default function ShowList() {
       {user && (
         <h2 className="m-3 text-center text-2xl">
           {user.username}
-          &apos;s Show List
+          &apos;s Anime List
         </h2>
       )}
       <UserShowList shows={showList} setShowList={setShowList} />

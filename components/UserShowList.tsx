@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { throttle } from 'lodash';
 import { RelativeRankedShow, RelativeRankStore } from '../redux/store';
 import {
   updateUserShowList,
@@ -28,22 +29,32 @@ type showsAndUpdateShows = {
   setShowList: (shows: RelativeRankedShow[]) => void;
 };
 
+const searchDelay = {
+  readyToSearch: null,
+};
+
+function searchOnType(searchToExecute, sendSearch) {
+  const symbol = Symbol(searchToExecute);
+
+  searchDelay.readyToSearch = symbol;
+  setTimeout(() => {
+    if (searchToExecute && searchDelay.readyToSearch === symbol) {
+      sendSearch(searchToExecute);
+    }
+  }, 1500);
+}
+
 export default function UserShowList({
   shows,
   setShowList,
 }: showsAndUpdateShows) {
-  const userShowsLoading = useSelector<RelativeRankStore, boolean>(
-    (state) => state.isFetchingUserShows,
+  const store = useSelector<RelativeRankStore, RelativeRankStore>(
+    (state) => state,
   );
-  const searchResultsLoading = useSelector<RelativeRankStore, boolean>(
-    (state) => state.isFetchingSearchResults,
-  );
-  const searchResults = useSelector<RelativeRankStore, RelativeRankedShow[]>(
-    (state) => state.searchResults,
-  );
-  const searchExecuted = useSelector<RelativeRankStore, boolean>(
-    (state) => state.searchWasExecuted,
-  );
+  const userShowsLoading = store.isFetchingUserShows;
+  const searchResultsLoading = store.isFetchingSearchResults;
+  const { searchResults } = store;
+  const searchExecuted = store.searchWasExecuted;
 
   const [searchTerm, setSearchTerm] = useState<string>('');
   const dispatch = useDispatch();
@@ -123,8 +134,10 @@ export default function UserShowList({
     dispatch(clearSearchResults());
   }
 
-  function sendSearch() {
-    if (searchTerm.length > 0) {
+  function sendSearch(searchParam = null) {
+    if (searchParam && searchParam.length > 0) {
+      dispatch(search(searchParam));
+    } else if (searchTerm.length > 0) {
       dispatch(search(searchTerm));
     }
   }
@@ -154,7 +167,10 @@ export default function UserShowList({
                   type="text"
                   value={searchTerm}
                   className="flex-grow border-solid border-4 m-2 p-1 rounded focus:outline-none focus:shadow-outline"
-                  onChange={(event) => setSearchTerm(event.target.value)}
+                  onChange={(event) => {
+                    setSearchTerm(event.target.value);
+                    searchOnType(event.target.value, sendSearch);
+                  }}
                   onKeyPress={onKeyPress}
                 />
                 <div className="text-center min-w-full sm:min-w-0">
