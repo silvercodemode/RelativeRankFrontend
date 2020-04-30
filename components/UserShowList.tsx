@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -227,21 +228,25 @@ export default function UserShowList({
               <div className="mt-20">
                 <LoadingSpinner />
               </div>
+            ) : shows.length < 1 ? (
+              <p className="m-3">No shows yet.</p>
             ) : (
               <>
-                <div className="max-w-xl mb-5 mx-auto text-center">
-                  <button
-                    type="button"
-                    className="p-2 rounded-lg shadow-md"
-                    onClick={() => {
-                      window.scrollTo({
-                        top: document.body.scrollHeight,
-                      });
-                    }}
-                  >
-                    Go To Bottom
-                  </button>
-                </div>
+                {shows.length > 10 && (
+                  <div className="max-w-xl mb-5 mx-auto text-center">
+                    <button
+                      type="button"
+                      className="p-2 rounded-lg shadow-md"
+                      onClick={() => {
+                        window.scrollTo({
+                          top: document.body.scrollHeight,
+                        });
+                      }}
+                    >
+                      Go To Bottom
+                    </button>
+                  </div>
+                )}
                 {shows.map((show) => (
                   <DraggableRankedShow
                     key={show.name}
@@ -249,19 +254,21 @@ export default function UserShowList({
                     updator={deleteShow}
                   />
                 ))}
-                <footer className="max-w-xl m-5 mx-auto text-center">
-                  <button
-                    type="button"
-                    className="m-4 p-2 rounded-lg shadow-md"
-                    onClick={() => {
-                      window.scrollTo({
-                        top: 0,
-                      });
-                    }}
-                  >
-                    Back to Top
-                  </button>
-                </footer>
+                {shows.length > 10 && (
+                  <footer className="max-w-xl m-5 mx-auto text-center">
+                    <button
+                      type="button"
+                      className="m-4 p-2 rounded-lg shadow-md"
+                      onClick={() => {
+                        window.scrollTo({
+                          top: 0,
+                        });
+                      }}
+                    >
+                      Back to Top
+                    </button>
+                  </footer>
+                )}
               </>
             )}
             {provided.placeholder}
