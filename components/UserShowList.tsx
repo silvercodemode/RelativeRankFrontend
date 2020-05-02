@@ -9,9 +9,12 @@ import {
   updateUserShowList,
   search,
   clearSearchResults,
+  startImportFromMal,
+  receiveImportFromMal,
 } from '../redux/action-creators';
 import DraggableRankedShow from './DraggableRankedShow';
 import LoadingSpinner from './LoadingSpinner';
+import { importFromMalEndpoint } from '../urls';
 
 type dropppableLocation = {
   droppableId: string;
@@ -57,6 +60,7 @@ export default function UserShowList({
   const searchExecuted = store.searchWasExecuted;
 
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [username, setUsername] = useState('');
   const dispatch = useDispatch();
 
   function onDragEnd({ source, destination }: dragResult) {
@@ -145,6 +149,26 @@ export default function UserShowList({
   function onKeyPress(event) {
     if (event.key === 'Enter') {
       sendSearch();
+    }
+  }
+
+  async function importFromMal() {
+    dispatch(startImportFromMal());
+    let showList: RelativeRankedShow[] = null;
+    try {
+      const response = await fetch(
+        `${importFromMalEndpoint}?username=${username}`,
+      );
+      showList = await response.json();
+    } finally {
+      setShowList(showList);
+      dispatch(receiveImportFromMal());
+    }
+  }
+
+  function onKeyPressImportFromMal(event) {
+    if (event.key === 'Enter') {
+      importFromMal();
     }
   }
 
@@ -245,7 +269,38 @@ export default function UserShowList({
                 <LoadingSpinner />
               </div>
             ) : shows.length < 1 ? (
-              <p className="m-3">No shows yet.</p>
+              <>
+                <p className="m-3">No shows yet.</p>
+                <div className="m-5 shadow-md p-3 rounded-lg flex flex-col justify-center items-center">
+                  <h2 className="text-center mb-1 text-xl">
+                    Import from MyAnimeList?
+                  </h2>
+                  <p className="text-center text-xs">
+                    (MAL account must be public)
+                  </p>
+                  <div className="flex-auto flex justify-between">
+                    <label htmlFor="username" className="text-lg m-2">
+                      MAL Username
+                    </label>
+                    <input
+                      id="username"
+                      type="text"
+                      value={username}
+                      className="flex-grow border-solid border-4 m-2 p-1 rounded focus:outline-none focus:shadow-outline"
+                      onChange={(event) => setUsername(event.target.value)}
+                      onKeyPress={onKeyPressImportFromMal}
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    className="m-2 max-w-xs bg-green-800 hover:bg-green-700 text-white text-lg py-2 px-4 rounded flex-grow-0"
+                    onClick={() => importFromMal()}
+                  >
+                    Import
+                  </button>
+                </div>
+              </>
             ) : (
               <>
                 {shows.length > 10 && (

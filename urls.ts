@@ -7,3 +7,4 @@ export const userShowlistUrlMaker = (username) =>
   `${baseUrl}/user/${username}/showlist`;
 export const searchUrlMaker = (searchTerm) =>
   `${baseUrl}/show/search?search-term=${searchTerm}`;
+export const importFromMalEndpoint = `${baseUrl}/import-from-mal`;

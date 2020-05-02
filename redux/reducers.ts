@@ -11,6 +11,8 @@ import {
   START_SEARCH,
   RECEIVE_SEARCH_RESULT,
   CLEAR_SEARCH_RESULTS,
+  START_IMPORT_FROM_MAL,
+  RECEIVE_IMPORT_FROM_MAL,
 } from './action-creators';
 import { RelativeRankStore, defaultState } from './store';
 
@@ -89,6 +91,16 @@ export default function MainReducer(
         ...state,
         searchResults: action.searchResult,
         searchWasExecuted: action.searchWasExecuted,
+      };
+    case START_IMPORT_FROM_MAL:
+      return {
+        ...state,
+        isFetchingUserShows: action.isFetchingUserShows,
+      };
+    case RECEIVE_IMPORT_FROM_MAL:
+      return {
+        ...state,
+        isFetchingUserShows: action.isFetchingUserShows,
       };
     default:
       return state;

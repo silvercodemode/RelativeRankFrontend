@@ -5,6 +5,7 @@ import {
   loginEndpoint,
   userShowlistUrlMaker,
   searchUrlMaker,
+  importFromMalEndpoint,
 } from '../urls';
 import { RelativeRankStore, RelativeRankedShow, PagedShowList } from './store';
 
@@ -321,4 +322,28 @@ export const clearSearchResults = (): ClearSearchResults => ({
   type: CLEAR_SEARCH_RESULTS,
   searchResult: [],
   searchWasExecuted: false,
+});
+
+export const START_IMPORT_FROM_MAL = 'START_IMPORT_FROM_MAL';
+
+export interface StartImportFromMalAction {
+  type: typeof START_IMPORT_FROM_MAL;
+  isFetchingUserShows: boolean;
+}
+
+export const startImportFromMal = (): StartImportFromMalAction => ({
+  type: START_IMPORT_FROM_MAL,
+  isFetchingUserShows: true,
+});
+
+export const RECEIVE_IMPORT_FROM_MAL = 'RECEIVE_IMPORT_FROM_MAL';
+
+export interface ReceiveImportFromMalAction {
+  type: typeof RECEIVE_IMPORT_FROM_MAL;
+  isFetchingUserShows: boolean;
+}
+
+export const receiveImportFromMal = (): ReceiveImportFromMalAction => ({
+  type: RECEIVE_IMPORT_FROM_MAL,
+  isFetchingUserShows: false,
 });
