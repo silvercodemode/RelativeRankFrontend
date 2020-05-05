@@ -9,7 +9,7 @@ function App({ Component, pageProps }) {
   return (
     <Provider store={store}>
       <Head>
-        <title>Relative Rank</title>
+        <title>RelativeRank</title>
         <meta
           name="Description"
           content="Rank anime relative to individual preference then map that to a global scale."

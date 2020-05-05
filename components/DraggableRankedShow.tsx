@@ -1,13 +1,13 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import React, { useRef } from 'react';
+import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { RelativeRankedShow as RelativeRankedShowType } from '../redux/store';
 
-type ShowWithUpdatorFunction = {
+type ShowWithUpdatorAndMoveFunctions = {
   show: RelativeRankedShowType;
-  updator: (name: string) => void;
-  moveToTop: (name: string) => void;
-  moveToBottom: (name: string) => void;
+  updator: (showName: string) => void;
+  moveToTop: (showName: string) => void;
+  moveToBottom: (showName: string) => void;
+  openMoveToRankPrompt: (showName: string) => void;
 };
 
 export default function DraggableRankedShow({
@@ -15,7 +15,8 @@ export default function DraggableRankedShow({
   updator,
   moveToTop,
   moveToBottom,
-}: ShowWithUpdatorFunction) {
+  openMoveToRankPrompt,
+}: ShowWithUpdatorAndMoveFunctions) {
   const { name, rank, percentileRank } = show;
 
   return (
@@ -56,6 +57,15 @@ export default function DraggableRankedShow({
               onClick={() => moveToBottom(name)}
             >
               Move to Bottom
+            </button>
+            <button
+              type="button"
+              className={`p-1 ml-2 rounded-lg shadow-md hover:bg-${
+                rank % 2 === 1 ? 'gray-100' : 'green-700'
+              }`}
+              onClick={() => openMoveToRankPrompt(name)}
+            >
+              Move to Rank
             </button>
             <button
               type="button"

@@ -1,20 +1,15 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable react/jsx-props-no-spreading */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { throttle } from 'lodash';
 import { RelativeRankedShow, RelativeRankStore } from '../redux/store';
 import {
   updateUserShowList,
-  search,
-  clearSearchResults,
   startImportFromMal,
   receiveImportFromMal,
 } from '../redux/action-creators';
 import DraggableRankedShow from './DraggableRankedShow';
 import LoadingSpinner from './LoadingSpinner';
+import ShowSearch from './ShowSearch';
 import { importFromMalEndpoint } from '../urls';
 
 type dropppableLocation = {
@@ -33,21 +28,6 @@ type showsAndUpdateShows = {
   setShowList: (shows: RelativeRankedShow[]) => void;
 };
 
-const searchDelay = {
-  readyToSearch: null,
-};
-
-function searchOnType(searchToExecute, sendSearch) {
-  const symbol = Symbol(searchToExecute);
-
-  searchDelay.readyToSearch = symbol;
-  setTimeout(() => {
-    if (searchToExecute && searchDelay.readyToSearch === symbol) {
-      sendSearch(searchToExecute);
-    }
-  }, 1000);
-}
-
 export default function UserShowList({
   shows,
   setShowList,
@@ -56,16 +36,19 @@ export default function UserShowList({
     (state) => state,
   );
   const userShowsLoading = store.isFetchingUserShows;
-  const searchResultsLoading = store.isFetchingSearchResults;
-  const { searchResults } = store;
-  const searchExecuted = store.searchWasExecuted;
 
-  const [searchTerm, setSearchTerm] = useState<string>('');
   const [username, setUsername] = useState('');
   const [listHasUnsavedChanges, setListHasUnsavedChanges] = useState<boolean>(
     false,
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
+
+  const [moveToRankPromptIsOpen, setMoveToRankPromptOpen] = useState<boolean>(
+    false,
+  );
+  const [moveToRankShow, setMoveToRankShow] = useState<string>('');
+  const [moveToRankRank, setMoveToRankRank] = useState<number>(1);
+
   const dispatch = useDispatch();
 
   function onDragStart() {
@@ -127,6 +110,41 @@ export default function UserShowList({
     setListHasUnsavedChanges(true);
   }
 
+  function openMoveToRankPrompt(showName: string) {
+    setMoveToRankPromptOpen(true);
+    setMoveToRankShow(showName);
+  }
+
+  function cancelMoveToRank() {
+    setMoveToRankPromptOpen(false);
+    setMoveToRankShow('');
+  }
+
+  function moveToRank() {
+    const show = shows.find((s) => s.name === moveToRankShow);
+    const otherShows = shows.filter((s) => s.name !== moveToRankShow);
+    let updatedShows = otherShows
+      ? [
+          ...otherShows.slice(0, moveToRankRank - 1),
+          show,
+          ...otherShows.slice(moveToRankRank - 1),
+        ]
+      : [show];
+    updatedShows = updatedShows.map((s, i) => ({
+      name: s.name,
+      rank: i + 1,
+      percentileRank: 1 - (1 / (shows.length + 1)) * (i + 1),
+    }));
+    setShowList(updatedShows);
+    setListHasUnsavedChanges(true);
+    cancelMoveToRank();
+
+    const y = window.scrollY;
+    setTimeout(() => {
+      window.scrollTo(0, y);
+    }, 0);
+  }
+
   function addShowToTop(showName) {
     if (shows.some((show) => show.name === showName)) {
       return;
@@ -179,24 +197,6 @@ export default function UserShowList({
     setListHasUnsavedChanges(true);
   }
 
-  function clearSearch() {
-    dispatch(clearSearchResults());
-  }
-
-  function sendSearch(searchParam = null) {
-    if (searchParam && searchParam.length > 0) {
-      dispatch(search(searchParam));
-    } else if (searchTerm.length > 0) {
-      dispatch(search(searchTerm));
-    }
-  }
-
-  function onKeyPress(event) {
-    if (event.key === 'Enter') {
-      sendSearch();
-    }
-  }
-
   async function importFromMal() {
     dispatch(startImportFromMal());
     let showList: RelativeRankedShow[] = null;
@@ -223,126 +223,56 @@ export default function UserShowList({
       <Droppable droppableId="user-show-list">
         {(provided) => (
           <>
-            {!isDragging &&
-              !userShowsLoading &&
-              (listHasUnsavedChanges || shows.length > 10) && (
-                <div className="fixed content-center justify-center bottom-0 w-screen bg-white flex text-center">
-                  {shows.length > 10 && (
+            {moveToRankPromptIsOpen && (
+              <div className="fixed w-screen top-2/5">
+                <div className="w-3/5 mx-auto bg-white shadow-md p-3 rounded-lg flex flex-col content-center justify-center items-center">
+                  <h2 className="text-center mb-1 text-xl">
+                    Move: {moveToRankShow}
+                  </h2>
+                  <div className="flex-auto flex justify-between">
+                    <label htmlFor="username" className="text-lg m-2">
+                      Rank to Move to:
+                    </label>
+                    <input
+                      id="rank-to-move-to"
+                      type="number"
+                      min={1}
+                      max={shows.length}
+                      value={moveToRankRank}
+                      className="flex-grow border-solid border-4 m-2 p-1 rounded focus:outline-none focus:shadow-outline"
+                      onChange={(event) =>
+                        setMoveToRankRank(parseInt(event.target.value, 10))
+                      }
+                    />
+                  </div>
+                  <div>
                     <button
                       type="button"
-                      className="m-4 p-2 rounded-lg shadow-md hover:bg-gray-100"
-                      onClick={() => {
-                        window.scrollTo({
-                          top: 0,
-                        });
-                      }}
+                      className="m-2 max-w-xs bg-green-800 hover:bg-green-700 text-white text-lg py-2 px-4 rounded flex-grow-0"
+                      onClick={() => cancelMoveToRank()}
                     >
-                      Go to Top
+                      Cancel
                     </button>
-                  )}
-                  {shows.length > 10 && (
+
                     <button
                       type="button"
-                      className="m-4 p-2 rounded-lg shadow-md hover:bg-gray-100"
-                      onClick={() => {
-                        window.scrollTo({
-                          top: document.body.scrollHeight,
-                        });
-                      }}
+                      className="m-2 max-w-xs bg-green-800 hover:bg-green-700 text-white text-lg py-2 px-4 rounded flex-grow-0"
+                      onClick={() => moveToRank()}
                     >
-                      Go To Bottom
+                      Move
                     </button>
-                  )}
-                  {listHasUnsavedChanges && (
-                    <button
-                      type="button"
-                      className="m-4 bg-red-700 hover:bg-red-600 text-white text-lg py-2 px-4 rounded"
-                      onClick={() => {
-                        dispatch(updateUserShowList(shows));
-                        setListHasUnsavedChanges(false);
-                      }}
-                    >
-                      Save Changes
-                    </button>
-                  )}
+                  </div>
                 </div>
-              )}
+              </div>
+            )}
             <main
               className="max-w-xl mx-5 mt-5 mb-20 mx-auto text-center"
               ref={provided.innerRef}
             >
-              <div className="rounded-lg shadow-md my-2 py-2">
-                <h4>Add Show</h4>
-                <div className="pl-5 pr-5 flex flex-wrap content-center justify-between">
-                  <label htmlFor="search" className="text-lg m-2 pt-2">
-                    Search
-                  </label>
-                  <input
-                    id="search"
-                    type="text"
-                    value={searchTerm}
-                    className="flex-grow border-solid border-4 m-2 p-1 rounded focus:outline-none focus:shadow-outline"
-                    onChange={(event) => {
-                      setSearchTerm(event.target.value);
-                      searchOnType(event.target.value, sendSearch);
-                    }}
-                    onKeyPress={onKeyPress}
-                  />
-                  <div className="text-center min-w-full sm:min-w-0">
-                    <button
-                      type="button"
-                      className="m-2 max-w-xs bg-green-800 hover:bg-green-700 text-white text-lg py-2 px-4 rounded flex-grow-0"
-                      onClick={sendSearch}
-                    >
-                      Search
-                    </button>
-                  </div>
-                </div>
-                {(searchExecuted || searchResultsLoading) &&
-                  (searchResultsLoading ? (
-                    <div className="mb-4">
-                      <LoadingSpinner />
-                    </div>
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        className="mx-auto p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
-                        onClick={clearSearch}
-                      >
-                        Clear Search Results
-                      </button>
-                      {searchResults.map && searchResults.length < 1 ? (
-                        <p>No shows matched your search.</p>
-                      ) : (
-                        searchResults.map((show: RelativeRankedShow) => (
-                          <div
-                            key={show.name}
-                            className="flex justify-between pl-5 pr-5"
-                          >
-                            <p className="pt-2 max-w-xs">{show.name}</p>
-                            <div>
-                              <button
-                                type="button"
-                                className="m-2 p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
-                                onClick={() => addShowToTop(show.name)}
-                              >
-                                Add To Top
-                              </button>
-                              <button
-                                type="button"
-                                className="m-2 p-1 max-w-xs bg-green-800 hover:bg-green-700 text-white text-xs rounded"
-                                onClick={() => addShowToBottom(show.name)}
-                              >
-                                Add To Bottom
-                              </button>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </>
-                  ))}
-              </div>
+              <ShowSearch
+                addShowToBottom={addShowToBottom}
+                addShowToTop={addShowToTop}
+              />
               <div className="pl-5 pr-5 flex content-center justify-center text-center">
                 <p className="m-3 text-lg">Drag and drop to reorder list.</p>
               </div>
@@ -398,12 +328,57 @@ export default function UserShowList({
                       updator={deleteShow}
                       moveToTop={moveToTop}
                       moveToBottom={moveToBottom}
+                      openMoveToRankPrompt={openMoveToRankPrompt}
                     />
                   ))}
                 </div>
               )}
               {provided.placeholder}
             </main>
+            {!isDragging &&
+              !userShowsLoading &&
+              (listHasUnsavedChanges || shows.length > 10) && (
+                <footer className="fixed content-center justify-center bottom-0 w-screen bg-white flex text-center">
+                  {shows.length > 10 && (
+                    <button
+                      type="button"
+                      className="m-4 p-2 rounded-lg shadow-md hover:bg-gray-100"
+                      onClick={() => {
+                        window.scrollTo({
+                          top: 0,
+                        });
+                      }}
+                    >
+                      Go to Top
+                    </button>
+                  )}
+                  {shows.length > 10 && (
+                    <button
+                      type="button"
+                      className="m-4 p-2 rounded-lg shadow-md hover:bg-gray-100"
+                      onClick={() => {
+                        window.scrollTo({
+                          top: document.body.scrollHeight,
+                        });
+                      }}
+                    >
+                      Go To Bottom
+                    </button>
+                  )}
+                  {listHasUnsavedChanges && (
+                    <button
+                      type="button"
+                      className="m-4 bg-red-700 hover:bg-red-600 text-white text-lg py-2 px-4 rounded"
+                      onClick={() => {
+                        dispatch(updateUserShowList(shows));
+                        setListHasUnsavedChanges(false);
+                      }}
+                    >
+                      Save Changes
+                    </button>
+                  )}
+                </footer>
+              )}
           </>
         )}
       </Droppable>
