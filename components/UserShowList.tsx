@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { RelativeRankedShow, RelativeRankStore } from '../redux/store';
 import {
+  fetchUserShowList,
   updateUserShowList,
   startImportFromMal,
   receiveImportFromMal,
@@ -23,18 +24,13 @@ type dragResult = {
   destination: dropppableLocation;
 };
 
-type showsAndUpdateShows = {
-  shows: RelativeRankedShow[];
-  setShowList: (shows: RelativeRankedShow[]) => void;
-};
-
-export default function UserShowList({
-  shows,
-  setShowList,
-}: showsAndUpdateShows) {
+export default function UserShowList() {
+  const [shows, setShowList] = useState<RelativeRankedShow[]>([]);
   const store = useSelector<RelativeRankStore, RelativeRankStore>(
     (state) => state,
   );
+  const { user } = store;
+
   const userShowsLoading = store.isFetchingUserShows;
 
   const [username, setUsername] = useState('');
@@ -50,6 +46,17 @@ export default function UserShowList({
   const [moveToRankRank, setMoveToRankRank] = useState<number>(1);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchUserShowList());
+      setShowList(user && user.showList ? user.showList : []);
+    }
+  }, [user && user.username]);
+
+  useEffect(() => {
+    setShowList(user && user.showList ? user.showList : []);
+  }, [user && user.showListChangeMarker]);
 
   function onDragStart() {
     setIsDragging(true);

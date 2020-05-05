@@ -1,20 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Navbar from '../components/Navbar';
 import UserShowList from '../components/UserShowList';
-import { fetchUserShowList } from '../redux/action-creators';
-import { RelativeRankStore, User, RelativeRankedShow } from '../redux/store';
+import { RelativeRankStore, User } from '../redux/store';
 
 export default function ShowList() {
   const user = useSelector<RelativeRankStore, User>((state) => state.user);
-  const dispatch = useDispatch();
-  const [showList, setShowList] = useState<RelativeRankedShow[]>([]);
-  useEffect(() => {
-    if (user) {
-      dispatch(fetchUserShowList());
-      setShowList(user && user.showList ? user.showList : []);
-    }
-  }, [user ? (user.showList ? user.showList.length : user.showList) : user]);
 
   return (
     <>
@@ -25,7 +16,7 @@ export default function ShowList() {
           &apos;s Anime List
         </h2>
       )}
-      <UserShowList shows={showList} setShowList={setShowList} />
+      <UserShowList />
     </>
   );
 }

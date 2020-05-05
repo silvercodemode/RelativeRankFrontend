@@ -44,6 +44,7 @@ export default function MainReducer(
           username: action.signUpResponse.username,
           token: action.signUpResponse.token,
           showList: null,
+          showListChangeMarker: null,
         },
       };
     case FAILED_SIGN_UP_OR_LOGIN:
@@ -71,6 +72,7 @@ export default function MainReducer(
           username: state.user.username,
           token: state.user.token,
           showList: action.showList,
+          showListChangeMarker: Symbol(state.user.username),
         },
         isFetchingUserShows: action.isFetchingUserShows,
       };
