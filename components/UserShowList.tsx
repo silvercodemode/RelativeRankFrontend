@@ -294,8 +294,10 @@ export default function UserShowList() {
                     <h2 className="text-center mb-1 text-xl">
                       Import from MyAnimeList?
                     </h2>
-                    <p className="text-center text-xs">
-                      (MAL account must be public)
+                    <p className="text-xs">MAL account must be public.</p>
+                    <p className="text-xs">
+                      Imports shows marked as completed and shows that have been
+                      scored.
                     </p>
                     <div className="flex-auto flex justify-between">
                       <label htmlFor="username" className="text-lg m-2">
