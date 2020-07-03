@@ -60,15 +60,15 @@ export default function Navbar() {
             </a>
           </Link>
           {user && (
-            <Link href="show-list">
+            <Link href="/show-list">
               <a className="block mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white mr-4">
                 Your List
               </a>
             </Link>
           )}
-          <Link href="about">
+          <Link href="/about">
             <a
-              href="About"
+              href="/about"
               className="block mt-4 lg:inline-block lg:mt-0 text-green-200 hover:text-white"
             >
               About
