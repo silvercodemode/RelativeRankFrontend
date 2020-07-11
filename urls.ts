@@ -1,4 +1,4 @@
-const baseUrl = 'https://relative-rank-api.azurewebsites.net';
+const baseUrl = 'http://67.205.136.220:5000';
 
 export const relativeRankedShowsEndpoint = `${baseUrl}/index`;
 export const signUpEndpoint = `${baseUrl}/user/signup`;
