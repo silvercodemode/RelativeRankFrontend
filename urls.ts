@@ -1,4 +1,4 @@
-const baseUrl = 'http://67.205.136.220:5000';
+const baseUrl = 'https://relativerank-api.martinpayne.dev';
 
 export const relativeRankedShowsEndpoint = `${baseUrl}/index`;
 export const signUpEndpoint = `${baseUrl}/user/signup`;
