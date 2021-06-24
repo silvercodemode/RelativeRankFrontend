@@ -26,10 +26,8 @@ export default function Navbar() {
       if (defaultUser) {
         dispatch(
           successfulSignUpOrLogin({
-            id: null,
             username: defaultUser.username,
-            password: null,
-            token: defaultUser.token,
+            jwt: defaultUser.token,
           }),
         );
       }

@@ -1,10 +1,10 @@
-const baseUrl = 'https://relativerank-api.martinpayne.dev';
+const baseUrl = 'http://localhost:8080';
 
-export const relativeRankedShowsEndpoint = `${baseUrl}/index`;
-export const signUpEndpoint = `${baseUrl}/user/signup`;
-export const loginEndpoint = `${baseUrl}/user/login`;
+export const relativeRankedShowsEndpoint = `${baseUrl}/global-ranked-show-list`;
+export const signUpEndpoint = `${baseUrl}/users`;
+export const loginEndpoint = `${baseUrl}/login`;
 export const userShowlistUrlMaker = (username) =>
-  `${baseUrl}/user/${username}/showlist`;
+  `${baseUrl}/show-lists/${username}`;
 export const searchUrlMaker = (searchTerm) =>
-  `${baseUrl}/show/search?search-term=${searchTerm}`;
+  `${baseUrl}/shows/?show-name=${searchTerm}`;
 export const importFromMalEndpoint = `${baseUrl}/import-from-mal`;

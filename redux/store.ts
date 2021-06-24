@@ -16,6 +16,18 @@ export interface User {
   showListChangeMarker: symbol;
 }
 
+export interface UserShowListResponse {
+  id: string;
+  username: string;
+  showList: RelativeRankedShow[];
+}
+
+export interface PagedShowListResponse {
+  id: string;
+  numberOfPages: number;
+  showList: RelativeRankedShow[];
+}
+
 export interface PagedShowList {
   page: number;
   pageSize: number;

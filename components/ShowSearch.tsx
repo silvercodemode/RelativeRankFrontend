@@ -54,6 +54,7 @@ export default function ShowSearch({
 
   function clearSearch() {
     dispatch(clearSearchResults());
+    setSearchTerm('');
   }
 
   return (
