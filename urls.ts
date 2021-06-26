@@ -1,4 +1,4 @@
-const baseUrl = 'http://localhost:8080';
+const baseUrl = 'https://relativerank-api.martinpayne.dev';
 
 export const relativeRankedShowsEndpoint = `${baseUrl}/global-ranked-show-list`;
 export const signUpEndpoint = `${baseUrl}/users`;
