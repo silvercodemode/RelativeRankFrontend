@@ -42,7 +42,7 @@ export default function MainReducer(
         attemptingSignUpOrLogin: action.attemptingSignUpOrLogin,
         user: {
           username: action.signUpResponse.username,
-          token: action.signUpResponse.token,
+          token: action.signUpResponse.jwt,
           showList: null,
           showListChangeMarker: null,
         },

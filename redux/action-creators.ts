@@ -5,9 +5,14 @@ import {
   loginEndpoint,
   userShowlistUrlMaker,
   searchUrlMaker,
-  importFromMalEndpoint,
 } from '../urls';
-import { RelativeRankStore, RelativeRankedShow, PagedShowList } from './store';
+import {
+  RelativeRankStore,
+  RelativeRankedShow,
+  PagedShowList,
+  PagedShowListResponse,
+  UserShowListResponse,
+} from './store';
 
 export const START_FETCHING_RELATIVE_RANKED_SHOW_LIST =
   'START_FETCHING_RELATIVE_RANKED_SHOW_LIST';
@@ -42,14 +47,18 @@ export const receiveRelativeRankedShowList = (
   isFetchingShows: false,
 });
 
-export const fetchRelativeRankedShowList = (page: number) => async (
-  dispatch,
-) => {
+export const fetchRelativeRankedShowList = (page = 1) => async (dispatch) => {
   dispatch(startFetchingRelativeRankedShowList());
   let showList: PagedShowList = null;
   try {
-    const response = await fetch(`${relativeRankedShowsEndpoint}?page=${page}`);
-    showList = await response.json();
+    const response = await fetch(`${relativeRankedShowsEndpoint}/${page}`);
+    const responseJson: PagedShowListResponse = await response.json();
+    showList = {
+      page: parseInt(responseJson.id, 10),
+      pageSize: 100,
+      numberOfPages: responseJson.numberOfPages,
+      results: responseJson.showList,
+    };
   } finally {
     dispatch(receiveRelativeRankedShowList(showList, page));
   }
@@ -132,7 +141,7 @@ export const sendSignUpRequest = (signUpParams: SignUpParams) => async (
       dispatch(successfulSignUpOrLogin(signUpResponse));
 
       localStorage.setItem('username', signUpResponse.username);
-      localStorage.setItem('token', signUpResponse.token);
+      localStorage.setItem('token', signUpResponse.jwt);
     } else {
       dispatch(failedSignUpOrLogin(response.statusText));
     }
@@ -151,10 +160,8 @@ export interface SignUpParams {
 }
 
 export interface SignUpResponse {
-  id: number;
   username: string;
-  password: string;
-  token: string;
+  jwt: string;
 }
 
 export const sendLoginRequest = (loginParams: SignUpParams) => async (
@@ -177,7 +184,7 @@ export const sendLoginRequest = (loginParams: SignUpParams) => async (
       dispatch(successfulSignUpOrLogin(signUpResponse));
 
       localStorage.setItem('username', signUpResponse.username);
-      localStorage.setItem('token', signUpResponse.token);
+      localStorage.setItem('token', signUpResponse.jwt);
     } else {
       dispatch(failedSignUpOrLogin(response.statusText));
     }
@@ -233,15 +240,23 @@ export const fetchUserShowList = () => async (
 ) => {
   dispatch(startFetchingUserShowList());
   let showList: RelativeRankedShow[] = null;
+  let showListResponse: UserShowListResponse = null;
   try {
     const response = await fetch(
       userShowlistUrlMaker(getState().user.username),
     );
-    showList = await response.json();
+    showListResponse = await response.json();
+    showList = showListResponse.showList;
   } finally {
     dispatch(receiveShowList(showList));
   }
 };
+
+export interface UpdateShowListResponse {
+  id: string;
+  username: string;
+  showList: RelativeRankedShow[];
+}
 
 export const updateUserShowList = (showList: RelativeRankedShow[]) => async (
   dispatch,
@@ -257,13 +272,11 @@ export const updateUserShowList = (showList: RelativeRankedShow[]) => async (
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({
-      Username: username,
-      ShowList: showList,
-    }),
+    body: JSON.stringify(showList),
   });
 
-  const updatedShowList: RelativeRankedShow[] = await response.json();
+  const json: UserShowListResponse = await response.json();
+  const { showList: updatedShowList } = json;
   dispatch(receiveShowList(updatedShowList));
 };
 
